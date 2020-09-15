@@ -28,19 +28,19 @@ func TestIamConfigErrors(t *testing.T) {
 	var err error
 
 	// Missing ApiKey.
-	_, err = NewIamAuthenticator("", "", "foo", "bar", false, nil)
+	_, err = NewIamAuthenticator("", "", "foo", "bar", false, nil, nil)
 	assert.NotNil(t, err)
 
 	// Invalid ApiKey.
-	_, err = NewIamAuthenticator("{invalid-apikey}", "", "foo", "bar", false, nil)
+	_, err = NewIamAuthenticator("{invalid-apikey}", "", "foo", "bar", false, nil, nil)
 	assert.NotNil(t, err)
 
 	// Missing ClientId.
-	_, err = NewIamAuthenticator("my-apikey", "", "", "bar", false, nil)
+	_, err = NewIamAuthenticator("my-apikey", "", "", "bar", false, nil, nil)
 	assert.NotNil(t, err)
 
 	// Missing ClientSecret.
-	_, err = NewIamAuthenticator("my-apikey", "", "foo", "", false, nil)
+	_, err = NewIamAuthenticator("my-apikey", "", "foo", "", false, nil, nil)
 	assert.NotNil(t, err)
 }
 
@@ -51,7 +51,7 @@ func TestIamAuthenticateFail(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, authenticator)
 	assert.Equal(t, authenticator.AuthenticationType(), AUTHTYPE_IAM)
@@ -107,7 +107,7 @@ func TestIamGetTokenSuccess(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -159,7 +159,7 @@ func TestIamGetCachedToken(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -208,7 +208,7 @@ func TestIamBackgroundTokenRefresh(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -261,7 +261,7 @@ func TestIamBackgroundTokenRefreshFailure(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -326,7 +326,7 @@ func TestIamBackgroundTokenRefreshIdle(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -433,7 +433,7 @@ func TestIamDisableSSL(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", true, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", true, nil, nil)
 	assert.Nil(t, err)
 
 	token, err := authenticator.getToken()
@@ -468,7 +468,7 @@ func TestIamUserHeaders(t *testing.T) {
 	headers["Header1"] = "Value1"
 	headers["Header2"] = "Value2"
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, headers)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, headers, nil)
 	assert.Nil(t, err)
 
 	token, err := authenticator.getToken()
@@ -536,7 +536,7 @@ func TestIamGetTokenTimeoutError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 
@@ -583,7 +583,7 @@ func TestIamGetTokenServerError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil)
+	authenticator, err := NewIamAuthenticator("bogus-apikey", server.URL, "", "", false, nil, nil)
 	assert.Nil(t, err)
 	assert.Nil(t, authenticator.tokenData)
 

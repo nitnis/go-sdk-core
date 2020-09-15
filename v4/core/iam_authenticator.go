@@ -70,6 +70,9 @@ type IamAuthenticator struct {
 	// made to the token server.
 	Headers map[string]string
 
+	// [Optional] Form parameters to be set in the authorization requests body, per RFC 6749
+	OptionalParameters map[string]string
+
 	// [Optional] The http.Client object used to invoke token server requests.
 	// If not specified by the user, a suitable default Client will be constructed.
 	Client *http.Client
@@ -83,7 +86,7 @@ var iamNeedsRefreshMutex sync.Mutex
 
 // NewIamAuthenticator constructs a new IamAuthenticator instance.
 func NewIamAuthenticator(apikey string, url string, clientId string, clientSecret string,
-	disableSSLVerification bool, headers map[string]string) (*IamAuthenticator, error) {
+	disableSSLVerification bool, headers map[string]string, optionalParams map[string]string) (*IamAuthenticator, error) {
 	authenticator := &IamAuthenticator{
 		ApiKey:                 apikey,
 		URL:                    url,
@@ -91,6 +94,7 @@ func NewIamAuthenticator(apikey string, url string, clientId string, clientSecre
 		ClientSecret:           clientSecret,
 		DisableSSLVerification: disableSSLVerification,
 		Headers:                headers,
+		OptionalParameters:     optionalParams,
 	}
 
 	// Make sure the config is valid.
@@ -115,7 +119,7 @@ func newIamAuthenticatorFromMap(properties map[string]string) (*IamAuthenticator
 	}
 	return NewIamAuthenticator(properties[PROPNAME_APIKEY], properties[PROPNAME_AUTH_URL],
 		properties[PROPNAME_CLIENT_ID], properties[PROPNAME_CLIENT_SECRET],
-		disableSSL, nil)
+		disableSSL, nil, nil)
 }
 
 // AuthenticationType returns the authentication type for this authenticator.
@@ -252,6 +256,11 @@ func (authenticator *IamAuthenticator) requestToken() (*iamTokenServerResponse, 
 		AddFormData("grant_type", "", "", REQUEST_TOKEN_GRANT_TYPE).
 		AddFormData("apikey", "", "", authenticator.ApiKey).
 		AddFormData("response_type", "", "", REQUEST_TOKEN_RESPONSE_TYPE)
+
+	// Add user-defined headers to request.
+	for pName, pValue := range authenticator.OptionalParameters {
+		builder.AddFormData(pName, "", "", pValue)
+	}
 
 	// Add user-defined headers to request.
 	for headerName, headerValue := range authenticator.Headers {
