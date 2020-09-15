@@ -1,4 +1,4 @@
-module github.com/nitnis/go-sdk-core
+module github.com/nitnis/go-sdk-core/v4
 
 go 1.12
 
